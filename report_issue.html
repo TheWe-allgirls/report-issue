@@ -1,3 +1,69 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report an Issue</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Report an Issue</h1>
+            <img src="/report issue.jpeg" alt="report">
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="report_issue.html">Report Issue</a></li>
+                    <li><a href="track_status.html">Track Status</a></li>
+                    <li><a href="il.html">issue leaderboard</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>Report an Issue</h2>
+        <form id="reportForm">
+            <label for="department">Department:</label>
+            <select id="department" name="department" required>
+                <option value="TRANSPORTATION">TRANSPORTATION</option>
+                <option value="ARCHITECTURE DEPARTMENT">ARCHITECTURE DEPARTMENT</option>
+                <option value="ADVERTISEMENT">ADVERTISEMENT</option>
+                <option value="BUILDING DEPARTMENT">BUILDING DEPARTMENT</option>
+                <option value="PUBLIC WORKS">PUBLIC WORKS</option>
+                <option value="PARKS AND RECREATION">PARKS AND RECREATION</option>
+                <option value="BUILDINGS AND FACILITIES">BUILDINGS AND FACILITIES</option>
+                <option value="WATER AND SEWER MANAGEMENT">WATER AND SEWER MANAGEMENT</option>
+                <option value="FLEET MANAGEMENT">FLEET MANAGEMENT</option>
+                <!-- Add other options here -->
+            <!-- </select>
+
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="4" placeholder="Describe the issue..."></textarea>
+
+            <label for="location">Location:</label>
+            <input type="text" id="location" name="location" required>
+
+            <label for="file-upload">Upload Photo/Video:</label>
+            <input type="file" id="file-upload" name="file-upload" accept="image/*,video/*" multiple>
+
+            <label for="email">Your Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <button type="submit">Submit Report</button>
+        </form>
+    </div> -->
+
+    <!-- <footer>
+        <p>&copy; 2024 Your Municipality. All rights reserved.</p>
+    </footer> -->
+
+    <!-- <script src="report.js"></script>
+</body>
+</html> --> 
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,6 +71,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Report an Issue</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
 </head>
 <body>
     <header>
@@ -46,8 +114,7 @@
             <input type="text" id="location" name="location" required>
 
             <label for="file-upload">Upload Photo/Video:</label>
-            <input type="file" id="file-upload" name="file-upload" accept="image/*,video/*" multiple>
-
+            <input type="file" id="file-upload" name="file-upload" accept="image/,video/" multiple>
             <label for="email">Your Email:</label>
             <input type="email" id="email" name="email" required>
 
@@ -59,6 +126,74 @@
         <p>&copy; 2024 Your Municipality. All rights reserved.</p>
     </footer> -->
 
-    <script src="report.js"></script>
+    <script type="module">
+        // Import Supabase
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+
+        // Initialize Supabase
+        const supabaseUrl = 'https://usmakmxitgqbznzpyzhi.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzbWFrbXhpdGdxYnpuenB5emhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjIwNzY1MjYsImV4cCI6MjAzNzY1MjUyNn0.jItGvlOI-2jYXqYpKDsbjWUDhlvXIB2sPIMODA4rLsY';
+
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        document.getElementById('reportForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const formData = new FormData(this);
+    const file = formData.get('file-upload');
+    let fileUrl = '';
+
+    // Check if a file is uploaded
+    if (file && file.size > 0) {
+        const fileExt = file.name.split('.').pop();
+        const filePath = reports/${Date.now()}.${fileExt};
+
+        // Upload file to Supabase Storage
+        const { data: fileData, error: fileError } = await supabase
+            .storage
+            .from('issues_images')
+            .upload(filePath, file, {
+                cacheControl: '3600',
+                upsert: false
+            });
+
+        if (fileError) {
+            console.error('File Upload Error:', fileError);
+            alert('There was an error uploading the file.');
+            return;
+        }
+
+        // Get the public URL for the uploaded file
+        const { data: publicUrlData } = supabase
+            .storage
+            .from('issues_images')
+            .getPublicUrl(filePath);
+
+        fileUrl = publicUrlData.publicUrl;
+    }
+
+    const data = {
+        department: formData.get('department'),
+        description: formData.get('description'),
+        location: formData.get('location'),
+        email: formData.get('email'),
+    };
+
+    // Only add the photo field if a file was uploaded
+    if (fileUrl) {
+        data.photo = fileUrl;
+    }
+    // Insert data into Supabase
+    const { data: insertData, error } = await supabase
+        .from('form_table')
+        .insert([data]);
+
+    if (error) {
+        console.error('Error:', error);
+        alert('There was an error reporting the issue.');
+    } else {
+        alert('Issue reported successfully!');
+    }
+});
+    </script>
 </body>
 </html>
