@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Status</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Track Status</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="report_issue.html">Report Issue</a></li>
+                    <li><a href="track_status.html">Track Status</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>Track Your Issue</h2>
+        <form id="trackForm">
+            <label for="reportId">Report ID:</label>
+            <input type="text" id="reportId" name="reportId" required>
+
+            <button type="submit">Check Status</button>
+        </form>
+
+        <div id="statusResult">
+            <!-- Status result will be displayed here -->
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Your Municipality. All rights reserved.</p>
+    </footer>
+
+    <script src="track_status.js"></script>
+</body>
+</html>
